@@ -17,16 +17,15 @@ jobs:
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-        # Fetch a random user's email from GitHub API
         RANDOM_USER_EMAIL=$(curl -s "https://api.github.com/users?since=$(( ( RANDOM % 10000 ) + 1 ))" | jq -r '.[] | select(.email != null) | .email' | shuf -n 1)
         if [ -z "$RANDOM_USER_EMAIL" ]; then
           RANDOM_USER_EMAIL="noreply@github.com"
         fi
-        echo "Co-authored-by: Random User <$RANDOM_USER_EMAIL>" >> commit.txt
 
-    - name: Run commit script
-      run: |
+        COMMIT_MESSAGE="Daily commit $(date)\n\nCo-authored-by: Random User <$RANDOM_USER_EMAIL>"
+        echo "Commit message:\n$COMMIT_MESSAGE"
+
         echo "Daily commit $(date)" > commit.txt
         git add commit.txt
-        git commit -m "Daily commit $(date)" --author='github-actions[bot] <github-actions[bot]@users.noreply.github.com>'
+        git commit -m "$COMMIT_MESSAGE"
         git push
