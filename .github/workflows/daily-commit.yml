@@ -27,6 +27,7 @@ jobs:
         echo "::set-output name=email::$RANDOM_USER_EMAIL"
     - name: Create daily commit
       run: |
+        git pull
         COMMIT_MESSAGE="Daily commit $(date)
         Co-authored-by: Random User <${{ steps.random_user.outputs.email }}>"
         echo "Commit message:"
