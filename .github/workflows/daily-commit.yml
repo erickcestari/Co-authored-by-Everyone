@@ -1,22 +1,19 @@
 name: Daily Commit
-
 on:
   schedule:
     - cron: '0 0 * * *'
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
+      with:
+        fetch-depth: 0
     - name: Set up Git
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
     - name: Get random user email
       id: random_user
       run: |
@@ -25,21 +22,18 @@ jobs:
           RANDOM_USER_EMAIL="noreply@github.com"
         fi
         echo "::set-output name=email::$RANDOM_USER_EMAIL"
-
     - name: Create daily commit
       run: |
+        git pull origin main
         COMMIT_MESSAGE="Daily commit $(date)
-
         Co-authored-by: Random User <${{ steps.random_user.outputs.email }}>"
         echo "Commit message:"
         echo "$COMMIT_MESSAGE"
-
         echo "Daily commit $(date)" > commit.txt
         git add commit.txt
         git commit -m "$COMMIT_MESSAGE"
-        git push
-
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        force: true
