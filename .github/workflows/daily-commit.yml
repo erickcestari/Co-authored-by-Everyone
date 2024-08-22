@@ -22,12 +22,10 @@ jobs:
           RANDOM_USER_EMAIL="noreply@github.com"
         fi
         echo "::set-output name=email::$RANDOM_USER_EMAIL"
-    - name: Create and switch to co-authored branch
+    - name: Create daily commit
       run: |
         git checkout -b co-authored || git checkout co-authored
         git pull origin co-authored || true
-    - name: Create daily commit
-      run: |
         COMMIT_MESSAGE="Daily commit $(date)
         Co-authored-by: Random User <${{ steps.random_user.outputs.email }}>"
         echo "Commit message:"
