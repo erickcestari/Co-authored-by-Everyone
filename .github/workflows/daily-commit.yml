@@ -17,15 +17,29 @@ jobs:
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-        RANDOM_USER_EMAIL=$(curl -s "https://api.github.com/users?since=$(( ( RANDOM % 10000 ) + 1 ))" | jq -r '.[] | select(.email != null) | .email' | shuf -n 1)
+    - name: Get random user email
+      id: random_user
+      run: |
+        RANDOM_USER_EMAIL=$(curl -s "https://api.github.com/users?since=$(( RANDOM % 10000 ))" | jq -r '.[] | select(.email != null) | .email' | shuf -n 1)
         if [ -z "$RANDOM_USER_EMAIL" ]; then
           RANDOM_USER_EMAIL="noreply@github.com"
         fi
+        echo "::set-output name=email::$RANDOM_USER_EMAIL"
 
-        COMMIT_MESSAGE="Daily commit $(date)\n\nCo-authored-by: Random User <$RANDOM_USER_EMAIL>"
-        echo "Commit message:\n$COMMIT_MESSAGE"
+    - name: Create daily commit
+      run: |
+        COMMIT_MESSAGE="Daily commit $(date)
+
+        Co-authored-by: Random User <${{ steps.random_user.outputs.email }}>"
+        echo "Commit message:"
+        echo "$COMMIT_MESSAGE"
 
         echo "Daily commit $(date)" > commit.txt
         git add commit.txt
         git commit -m "$COMMIT_MESSAGE"
         git push
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
