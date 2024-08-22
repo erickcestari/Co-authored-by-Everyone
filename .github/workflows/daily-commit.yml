@@ -20,16 +20,20 @@ jobs:
     - name: Get random user email
       id: random_user
       run: |
-        RANDOM_USER_EMAIL=$(curl -s "https://api.github.com/users?since=$(( RANDOM % 10000 ))" | jq -r '.[] | select(.email != null) | .email' | shuf -n 1)
-        if [ -z "$RANDOM_USER_EMAIL" ]; then
-          RANDOM_USER_EMAIL="noreply@github.com"
-        fi
-        echo "::set-output name=email::$RANDOM_USER_EMAIL"
+         PAGE=$((RANDOM % 1000 + 1))
+         RANDOM_USERNAME=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/users?per_page=100&page=$PAGE" | jq -r '.[] | select(.login != null) | .login' | shuf -n 1)
+         if [ -z "$RANDOM_USERNAME" ]; then
+          RANDOM_USERNAME="github-actions[bot]"
+         fi
+         RANDOM_USER_EMAIL="${RANDOM_USERNAME}@users.noreply.github.com"
+         echo "username=$RANDOM_USERNAME" >> $GITHUB_OUTPUT
+         echo "email=$RANDOM_USER_EMAIL" >> $GITHUB_OUTPUT
     - name: Create daily commit
       run: |
         git pull
         COMMIT_MESSAGE="Daily commit $(date)
-        Co-authored-by: Random User <${{ steps.random_user.outputs.email }}>"
+        Co-authored-by: ${{ steps.random_user.outputs.username }} <${{ steps.random_user.outputs.email }}>"
         echo "Commit message:"
         echo "$COMMIT_MESSAGE"
         echo "Daily commit $(date)" > commit.txt
