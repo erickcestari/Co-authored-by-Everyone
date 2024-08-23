@@ -23,8 +23,9 @@ jobs:
 
     - name: Import GPG key
       run: |
+        - name: Import GPG key
         echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-        echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --edit-key ${{ secrets.GPG_KEY_ID }} trust quit
+        gpg --batch --yes --edit-key ${{ secrets.GPG_KEY_ID }} trust quit
 
     - name: Get random user email
       id: random_user
