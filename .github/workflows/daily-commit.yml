@@ -51,6 +51,7 @@ jobs:
       run: |
         git pull
         COMMIT_MESSAGE="Daily commit $(date)
+        
         Co-authored-by: ${{ steps.random_user.outputs.username }} <${{ steps.random_user.outputs.email }}>"
         DATE=$(date +%Y-%m-%d)
         echo "$COMMIT_MESSAGE" > "commit_$DATE.txt"
