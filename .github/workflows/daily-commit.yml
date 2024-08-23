@@ -36,8 +36,9 @@ jobs:
         Co-authored-by: ${{ steps.random_user.outputs.username }} <${{ steps.random_user.outputs.email }}>"
         echo "Commit message:"
         echo "$COMMIT_MESSAGE"
-        echo "Daily commit $(date)" > commit.txt
-        git add commit.txt
+        DATE=$(date +%Y-%m-%d)
+        echo "$COMMIT_MESSAGE" > "commit_$DATE.txt"
+        git add commit_$DATE.txt
         git commit -m "$COMMIT_MESSAGE"
     - name: Push changes
       uses: ad-m/github-push-action@master
