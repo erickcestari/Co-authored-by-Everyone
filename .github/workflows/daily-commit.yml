@@ -38,7 +38,13 @@ jobs:
         RANDOM_USER_EMAIL="${RANDOM_USER}@users.noreply.github.com"
         echo "username=$RANDOM_USER" >> $GITHUB_OUTPUT
         echo "email=$RANDOM_USER_EMAIL" >> $GITHUB_OUTPUT
-
+        
+    - name: Configure GPG pinentry
+      run: |
+        echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+        echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+        gpg-connect-agent reloadagent /bye
+    
     - name: Create daily commit
       env:
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -49,7 +55,8 @@ jobs:
         DATE=$(date +%Y-%m-%d)
         echo "$COMMIT_MESSAGE" > "commit_$DATE.txt"
         git add commit_$DATE.txt
-        git commit -m "$COMMIT_MESSAGE" -S
+        echo "$GPG_PASSPHRASE" | gpg --pinentry-mode loopback --passphrase-fd 0 --batch -s -bsau ${{ secrets.GPG_KEY_ID }}
+        git commit -S -m "$COMMIT_MESSAGE"
 
     - name: Push changes
       uses: ad-m/github-push-action@master
