@@ -2,7 +2,6 @@ name: Daily Commit
 on:
   schedule:
     - cron: '0 0 * * *'
-
   workflow_dispatch:
     
 jobs:
@@ -13,19 +12,10 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-
     - name: Set up Git
       run: |
         git config --global user.name 'erickcestari'
         git config --global user.email 'erickcestari@users.noreply.github.com'
-        git config --global commit.gpgSign true
-        git config --global user.signingkey ${{ secrets.GPG_KEY_ID }}
-
-    - name: Import GPG key
-      run: |
-        echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-        echo -e "5\ny\n" | gpg --batch --no-tty --command-fd 0 --expert --edit-key ${{ secrets.GPG_KEY_ID }} trust
-
     - name: Get random user email
       id: random_user
       run: |
@@ -38,27 +28,16 @@ jobs:
         RANDOM_USER_EMAIL="${RANDOM_USER}@users.noreply.github.com"
         echo "username=$RANDOM_USER" >> $GITHUB_OUTPUT
         echo "email=$RANDOM_USER_EMAIL" >> $GITHUB_OUTPUT
-        
-    - name: Configure GPG pinentry
-      run: |
-        echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-        echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-        gpg-connect-agent reloadagent /bye
-    
     - name: Create daily commit
-      env:
-        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       run: |
         git pull
         COMMIT_MESSAGE="Daily commit $(date)
-        
+
         Co-authored-by: ${{ steps.random_user.outputs.username }} <${{ steps.random_user.outputs.email }}>"
         DATE=$(date +%Y-%m-%d)
         echo "$COMMIT_MESSAGE" > "commit_$DATE.txt"
         git add commit_$DATE.txt
-        echo "$GPG_PASSPHRASE" | gpg --pinentry-mode loopback --passphrase-fd 0 --batch -s -bsau ${{ secrets.GPG_KEY_ID }}
-        git commit -S -m "$COMMIT_MESSAGE"
-
+        git commit -m "$COMMIT_MESSAGE"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
