@@ -20,15 +20,15 @@ jobs:
     - name: Get random user email
       id: random_user
       run: |
-         PAGE=$((RANDOM % 1000 + 1))
-         RANDOM_USERNAME=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          "https://api.github.com/users?per_page=100&page=$PAGE" | jq -r '.[] | select(.login != null) | .login' | shuf -n 1)
-         if [ -z "$RANDOM_USERNAME" ]; then
-          RANDOM_USERNAME="github-actions[bot]"
-         fi
-         RANDOM_USER_EMAIL="${RANDOM_USERNAME}@users.noreply.github.com"
-         echo "username=$RANDOM_USERNAME" >> $GITHUB_OUTPUT
-         echo "email=$RANDOM_USER_EMAIL" >> $GITHUB_OUTPUT
+        RANDOM_USER_ID=$((RANDOM % 100000000 + 1))
+        RANDOM_USER=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/users?since=$RANDOM_USER_ID&per_page=1" | jq -r '.[0] | .login')
+        if [ -z "$RANDOM_USER" ]; then
+          RANDOM_USER="github-actions[bot]"
+        fi
+        RANDOM_USER_EMAIL="${RANDOM_USER}@users.noreply.github.com"
+        echo "username=$RANDOM_USER" >> $GITHUB_OUTPUT
+        echo "email=$RANDOM_USER_EMAIL" >> $GITHUB_OUTPUT
     - name: Create daily commit
       run: |
         git pull
