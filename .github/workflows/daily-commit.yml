@@ -23,7 +23,6 @@ jobs:
 
     - name: Import GPG key
       run: |
-        - name: Import GPG key
         echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
         gpg --batch --yes --edit-key ${{ secrets.GPG_KEY_ID }} trust quit
 
