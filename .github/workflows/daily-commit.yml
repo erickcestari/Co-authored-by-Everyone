@@ -23,7 +23,7 @@ jobs:
         RANDOM_USER=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           "https://api.github.com/users?since=$RANDOM_USER_ID&per_page=1" | jq -r '.[0] | .login')
         if [ -z "$RANDOM_USER" ]; then
-          RANDOM_USER="YOUR_GITHUB_USERNAME"
+          RANDOM_USER="not-found"
         fi
         RANDOM_USER_EMAIL="${RANDOM_USER}@users.noreply.github.com"
         echo "username=$RANDOM_USER" >> $GITHUB_OUTPUT
