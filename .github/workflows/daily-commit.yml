@@ -12,10 +12,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Set up Git
-      run: |
-        git config --global user.name 'erickcestari'
-        git config --global user.email 'erickcestari@users.noreply.github.com'
     - name: Get random user email
       id: random_user
       run: |
