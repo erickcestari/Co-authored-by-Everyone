@@ -4,3 +4,5 @@ This repository demonstrates an automated GitHub Actions workflow that creates a
 
 ## Purpose
 This project is meant for educational and demonstration purposes. It shows how to use GitHub Actions to automate commits and include different GitHub users as co-authors.
+
+---
